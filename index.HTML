@@ -1,21 +1,137 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Allison's Softball Profile</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* General styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ff80ab, #ffd700);
+      color: #fff;
+      position: relative;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, #ffd700, #ff4081);
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      border-bottom: 5px solid #ffd700;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4em;
+    }
+
+    .profile-pic {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 5px solid #ffd700;
+      object-fit: cover;
+      box-shadow: 0px 0px 15px #ffd700;
+    }
+
+    /* Main content */
+    main {
+      padding: 20px;
+    }
+
+    .about h2 {
+      border-bottom: 3px solid #ffd700;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
+    .about strong {
+      font-size: 1.3em;
+    }
+
+    .about p {
+      background: rgba(255, 128, 171, 0.6); /* soft pink background */
+      padding: 10px;
+      border-radius: 10px;
+      margin: 10px 0;
+      box-shadow: 0px 0px 10px #ffd700;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(90deg, #ff4081, #ffd700);
+      margin-top: 30px;
+      font-weight: bold;
+      border-top: 5px solid #ffd700;
+    }
+
+    /* Corner softball icons */
+    .corner {
+      position: fixed;
+      width: 70px;
+      height: 70px;
+      opacity: 0.9;
+      z-index: 999;
+      animation: spin 12s linear infinite;
+    }
+
+    .top-left { top: 15px; left: 15px; animation-direction: normal; }
+    .top-right { top: 15px; right: 15px; animation-direction: reverse; }
+    .bottom-left { bottom: 15px; left: 15px; animation-direction: reverse; }
+    .bottom-right { bottom: 15px; right: 15px; animation-direction: normal; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ✨ Sparkle shimmer effect */
+    .sparkle {
+      font-weight: bold;
+      background: linear-gradient(
+        270deg,
+        #ffd700,
+        #ff80ab,
+        #ffd700
+      );
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 6s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Decorative softballs in corners -->
+  <img src="softball.png" alt="Softball Icon" class="corner top-left">
+  <img src="softball.png" alt="Softball Icon" class="corner top-right">
+  <img src="softball.png" alt="Softball Icon" class="corner bottom-left">
+  <img src="softball.png" alt="Softball Icon" class="corner bottom-right">
+
   <header>
-    <h1>Allison's Softball Journey</h1>
+    <h1 class="sparkle">Allison's Softball Journey</h1>
     <img src="IMG_3343.jpeg" alt="Allison's Profile Picture" class="profile-pic">
   </header>
 
   <main>
     <section class="about">
-      <h2>About Allison</h2>
-      <p><strong>Softball Number: #10</strong></p>
+      <h2 class="sparkle">About Allison</h2>
+      <p><strong class="sparkle">Softball Number: #10</strong></p>
       <p>Allison is a dedicated softball pitcher who absolutely loves the game. Her favorite sport is softball, and she enjoys hitting with her DeMarini bat. In addition to pitching, Allison also plays third base and brings energy to every practice and game.</p>
       <p>She loves sliding, stealing bases, and making diving plays. Allison has many friends on her team and values bonding with them both on and off the field. Her dad has coached many of her teams when she was younger, and her mom, dad, and dog never miss a single game.</p>
       <p>Outside of softball, Allison plays three sports in total but dedicates most of her time to pitching practice almost every day. Her commitment and love for the sport make her an amazing athlete and teammate.</p>
@@ -23,61 +139,8 @@
   </main>
 
   <footer>
-    <p>Made with ❤️ for Allison</p>
+    <p class="sparkle">Made with ❤️ for Allison</p>
   </footer>
 </body>
 </html>
-style.css (no changes needed, still works with the number highlight)
-css
-Copy code
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #ffe6f0; /* Light pink */
-  color: #333;
-}
 
-header {
-  background-color: #ff80ab; /* Brighter pink */
-  padding: 20px;
-  text-align: center;
-  position: relative;
-}
-
-header h1 {
-  margin: 0;
-  color: white;
-}
-
-.profile-pic {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 4px solid white;
-  object-fit: cover;
-}
-
-main {
-  padding: 20px;
-}
-
-.about h2 {
-  color: #ff4081;
-}
-
-.about strong {
-  font-size: 1.2em;
-  color: #d81b60; /* Darker pink for emphasis */
-}
-
-footer {
-  text-align: center;
-  padding: 15px;
-  background-color: #ff80ab;
-  color: white;
-  margin-top: 20px;
-}
