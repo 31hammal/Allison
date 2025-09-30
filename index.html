@@ -20,7 +20,6 @@
   .header{grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;}
   h1{margin:0;font-size:20px;color:var(--accent-purple);display:flex;gap:8px;align-items:center}
   .badge{background:var(--accent-purple);color:white;padding:6px 10px;border-radius:999px;font-weight:600}
-  /* board */
   .board-wrap{background:var(--board-pink); padding:14px; border-radius:12px; box-shadow: 0 6px 20px rgba(182,150,255,0.12) inset; display:flex; flex-direction:column; align-items:center;}
   canvas#board{background:transparent;border-radius:8px; cursor:crosshair; image-rendering:pixelated;}
   .hud{display:flex;gap:10px;align-items:center;margin-top:10px}
@@ -30,20 +29,13 @@
   .upcoming{background:linear-gradient(180deg,#fff,#f6f4ff); padding:12px;border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.04);}
   .piece-slot{width:100%;height:90px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -6px 18px rgba(0,0,0,0.02);}
   .controls{display:flex;gap:8px;flex-wrap:wrap; margin-top:6px;}
-  /* shiny instruction button bottom-right */
-  #instrBtn{
-    position:fixed; right:20px; bottom:20px; z-index:1000;
+  #instrBtn{position:fixed; right:20px; bottom:20px; z-index:1000;
     background:linear-gradient(135deg,#f0e6ff,#eadbff); border:1px solid rgba(180,140,255,0.4); color:#4b2d8a; font-weight:700;
-    padding:12px 16px; border-radius:999px; box-shadow: 0 6px 18px rgba(160,120,255,0.18), 0 1px 0 rgba(255,255,255,0.6) inset; cursor:pointer;
-  }
-  #musicBtn{padding:10px 14px;border-radius:8px;border:none;background:linear-gradient(180deg,#fff,#f6f3ff);box-shadow:0 8px 20px rgba(0,0,0,0.06);cursor:pointer}
-  .muted{opacity:0.6}
+    padding:12px 16px; border-radius:999px; box-shadow: 0 6px 18px rgba(160,120,255,0.18), 0 1px 0 rgba(255,255,255,0.6) inset; cursor:pointer;}
   footer{grid-column:1 / -1; font-size:12px; color:#6b5aa0; text-align:center; margin-top:6px}
-  /* modal */
   .modal{position:fixed; inset:0; background:rgba(0,0,0,0.35); display:flex;align-items:center;justify-content:center; z-index:2000; display:none;}
   .modal .card{background:white; padding:18px; width:560px; max-width:92vw; border-radius:12px; box-shadow:0 30px 60px rgba(0,0,0,0.35);}
   .close{float:right; cursor:pointer; color:var(--accent-purple); font-weight:800}
-  /* responsive */
   @media (max-width:760px){ .app{grid-template-columns:1fr; width:98vw;} }
 </style>
 </head>
@@ -56,7 +48,7 @@
       </div>
     </div>
 
-    <div class="board-wrap" aria-hidden="false">
+    <div class="board-wrap">
       <canvas id="board" width="540" height="540" tabindex="0" aria-label="Game board"></canvas>
       <div class="hud">
         <div class="score-box">
@@ -74,27 +66,19 @@
           <div style="font-size:12px;color:#7a579f">Place each piece to get points</div>
         </div>
         <div id="upcomingContainer" style="display:grid;grid-template-rows:repeat(3,1fr);gap:8px">
-          <!-- three piece slots -->
           <div class="piece-slot" data-index="0" id="slot0"></div>
           <div class="piece-slot" data-index="1" id="slot1"></div>
           <div class="piece-slot" data-index="2" id="slot2"></div>
         </div>
         <div class="controls" style="margin-top:10px">
-          <button id="rotateBtn" title="Rotate preview" style="padding:8px 12px;border-radius:8px;border:none;background:var(--accent-purple);color:white;cursor:pointer">Rotate</button>
-          <button id="clearBtn" title="Clear board" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff;cursor:pointer">Reset Board</button>
-          <button id="hintBtn" title="Show one valid spot briefly" style="padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(180deg,#fff,#f6f4ff);cursor:pointer">Hint</button>
+          <button id="rotateBtn">Rotate</button>
+          <button id="clearBtn">Reset Board</button>
+          <button id="hintBtn">Hint</button>
         </div>
       </div>
 
       <div style="background:linear-gradient(180deg,#fff,#faf6ff);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.03);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-weight:800;color:var(--accent-purple)">Settings</div>
-          <div style="font-size:12px;color:#6b4fb2">decor accents: light purple</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="musicBtn">Music: On</button>
-          <label style="font-size:12px;color:#6b4fb2">Difficulty increases over time</label>
-        </div>
+        <div style="font-weight:800;color:var(--accent-purple)">Settings</div>
         <div style="margin-top:10px;font-size:13px;color:#5a3f9f">
           Tip: Each placed block = <strong>+1</strong> point. Full row cleared = <strong>+2</strong>. Whole board cleared = <strong>+3</strong>.
         </div>
@@ -104,9 +88,8 @@
     <footer>Made with 💜 · Blocks are light blue · Board pink · Accents light purple</footer>
   </div>
 
-  <button id="instrBtn" aria-haspopup="dialog">Instructions</button>
+  <button id="instrBtn">Instructions</button>
 
-  <!-- modal -->
   <div class="modal" id="modal">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -118,582 +101,162 @@
           <li>Drag or click a piece from the right and place it onto the 9×9 pink board. Each placed block gives you <strong>1 point</strong>.</li>
           <li>When a whole row becomes fully occupied, that row clears and you get <strong>2 extra points</strong>.</li>
           <li>If the whole board becomes empty (after clears), you earn <strong>3 extra points</strong>.</li>
-          <li>There are always 3 upcoming pieces. Difficulty increases slowly (pieces get larger or more complex) but the game will always ensure at least one valid placement exists.</li>
-          <li>Highscore is saved locally and shown above your current score.</li>
+          <li>Use keyboard: 1–3 to pick piece, Arrows to move, R to rotate, Enter/Space to place, Esc to cancel.</li>
         </ul>
-        <p style="font-size:13px;color:#5a3f9f">Music note: you asked for a specific copyrighted song. I cannot include that track. By default the game uses an ambient synth loop. To use your own audio file (that you have rights to), edit the <code>audioSrc</code> variable in the source at the top of the script.</p>
       </div>
     </div>
   </div>
 
 <script>
-/*
-  Allison's Blocks - Single-file HTML + JS
-  - 9x9 grid, light blue blocks, pink board, light purple accents
-  - 3 upcoming pieces, placed by click or drag
-  - scoring: each placed block = 1; full row cleared = +2; whole board cleared = +3
-  - highscore in localStorage
-  - music: default: synthesized ambient loop. To use your own URL, set audioSrc to a URL you have rights to.
-*/
+/* === GAME SCRIPT WITH KEYBOARD CONTROLS === */
+const ROWS = 9, COLS = 9, CELL_PX = 60;
+const canvas = document.getElementById('board'), ctx = canvas.getContext('2d');
 
-/* ====== CONFIG ====== */
-/* If you want to use your own audio file, replace null with a URL string you have rights to.
-   Example: const audioSrc = "https://example.com/your-instrumental.mp3";
-   IMPORTANT: I cannot provide or embed copyrighted tracks myself; only let you use a URL you control/own. */
-const audioSrc = null; // <-- replace with URL string you own if desired
-
-/* ====== GAME CONSTANTS ====== */
-const ROWS = 9, COLS = 9;
-const CELL_PX = 60; // canvas 540x540 matches 9*60
-const canvas = document.getElementById('board');
-const ctx = canvas.getContext('2d');
-
-let board = Array.from({length:ROWS},()=>Array(COLS).fill(0)); // 0 empty, 1 filled
+let board = Array.from({length:ROWS},()=>Array(COLS).fill(0));
 let score = 0;
 let highscore = Number(localStorage.getItem('allisonsBlocksHighscore')||0);
 document.getElementById('highscoreDisplay').textContent = "Highscore: " + highscore;
 document.getElementById('aboveScore').textContent = "Highscore: " + highscore;
-document.getElementById('score').textContent = score;
 
-const upcoming = [null,null,null]; // will hold shapes
-let selectedIndex = null;
-let selectedRotation = 0;
-let placementsCount = 0;
-let difficultyLevel = 0; // increases slowly
+const upcoming = [null,null,null];
+let selectedIndex = null, selectedRotation = 0, placementsCount = 0, difficultyLevel = 0;
+let previewRow = 0, previewCol = 0;
 
-/* Colors */
-const blockColor = "#bfe9ff"; // light blue
-const cellStroke = "rgba(123,60,167,0.12)"; // subtle
-const boardBg = "#ffd1e6"; // pink
-const accent = "#d6c7ff";
+const blockColor = "#bfe9ff", cellStroke = "rgba(123,60,167,0.12)", boardBg = "#ffd1e6";
 
-/* shapes: each shape is array of [x,y] offsets relative to anchor (0,0) */
 const BASE_SHAPES = [
-  [[0,0]], // single
-  [[0,0],[1,0]], // domino
-  [[0,0],[1,0],[2,0]], // tri line
-  [[0,0],[0,1],[1,0]], // small L
-  [[0,0],[1,0],[0,1],[1,1]], // square
-  [[0,0],[1,0],[2,0],[1,1]], // T
-  [[0,0],[0,1],[0,2]], // vertical line
-  [[0,0],[1,0],[2,0],[3,0]], // long line
-  [[0,0],[1,0],[2,0],[2,1]], // L longer
-  [[0,0],[1,0],[1,1],[2,1]], // zig
-  [[0,0],[0,1],[1,1],[1,2]], // step
-  [[0,0],[1,0],[0,1],[0,2]] // irregular
+  [[0,0]], [[0,0],[1,0]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[1,0]],
+  [[0,0],[1,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[1,1]],
+  [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0],[3,0]],
+  [[0,0],[1,0],[2,0],[2,1]], [[0,0],[1,0],[1,1],[2,1]],
+  [[0,0],[0,1],[1,1],[1,2]], [[0,0],[1,0],[0,1],[0,2]]
 ];
 
-/* utility: rotate shape 90deg clockwise */
-function rotateShape(shape){
-  return shape.map(([x,y])=>[y, -x]).map(([x,y])=>[x + 2, y + 2]); // keep positive by offset
-}
-
-/* produce rotated variants */
 function getRotations(shape){
   let res=[shape];
-  for(let i=1;i<4;i++){
-    res.push(res[i-1].map(([x,y])=>[y,-x])); // rotate
-  }
-  // normalize to min coords 0
+  for(let i=1;i<4;i++) res.push(res[i-1].map(([x,y])=>[y,-x]));
   return res.map(s=>{
     let minx=Math.min(...s.map(a=>a[0])), miny=Math.min(...s.map(a=>a[1]));
     return s.map(([x,y])=>[x-minx,y-miny]);
   });
 }
-
-/* generate a piece from available shapes and current difficulty */
 function generatePiece(dLevel){
-  // pick shapes biased to larger ones as difficulty grows
-  const pool = [];
-  BASE_SHAPES.forEach(s=>{
-    const size = s.length;
-    const weight = Math.max(1, size + Math.floor(dLevel/3) - (size>3?1:0));
-    for(let i=0;i<weight;i++) pool.push(s);
+  const pool=[]; BASE_SHAPES.forEach(s=>{
+    const w = Math.max(1, s.length + Math.floor(dLevel/3) - (s.length>3?1:0));
+    for(let i=0;i<w;i++) pool.push(s);
   });
-  // ensure we may add some slightly larger variants by merging shapes
-  let base = pool[Math.floor(Math.random() * pool.length)];
-  // random rotation applied later
-  const rotations = getRotations(base);
-  const variant = rotations[Math.floor(Math.random()*rotations.length)];
-  // normalize
-  const minx=Math.min(...variant.map(a=>a[0])), miny=Math.min(...variant.map(a=>a[1]));
-  const norm = variant.map(([x,y])=>[x-minx,y-miny]);
-  return norm;
+  const rotations=getRotations(pool[Math.floor(Math.random()*pool.length)]);
+  return rotations[Math.floor(Math.random()*rotations.length)];
 }
-
-/* ensure generated upcoming set has at least one valid placement on board */
-function ensurePlayableSet(arr){
-  // returns true if at least one piece can be placed somewhere
-  for(let piece of arr){
-    if(!piece) continue;
-    if(findAnyValidPlacement(piece)!==null) return true;
-  }
-  return false;
-}
-
-/* check if piece fits at anchor (r,c) considering bounds and collisions */
-function canPlace(piece, r, c){
+function canPlace(piece,r,c){
   for(const [x,y] of piece){
-    const rr = r + y, cc = c + x;
-    if(rr<0 || rr>=ROWS || cc<0 || cc>=COLS) return false;
+    const rr=r+y, cc=c+x;
+    if(rr<0||rr>=ROWS||cc<0||cc>=COLS) return false;
     if(board[rr][cc]) return false;
   }
   return true;
 }
-
-/* place piece onto board (assume valid) */
-function placePiece(piece, r, c){
-  for(const [x,y] of piece){
-    const rr = r + y, cc = c + x;
-    board[rr][cc] = 1;
-  }
-}
-
-/* find any valid placement for a piece; returns [r,c] or null */
+function placePiece(piece,r,c){ for(const [x,y] of piece) board[r+y][c+x]=1; }
 function findAnyValidPlacement(piece){
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      if(canPlace(piece,r,c)) return [r,c];
-    }
-  }
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(canPlace(piece,r,c)) return [r,c];
   return null;
 }
+function findFilledRows(){ return [...Array(ROWS).keys()].filter(r=>board[r].every(c=>c===1)); }
+function clearRows(rows){ rows.sort((a,b)=>a-b).forEach(r=>{ board.splice(r,1); board.unshift(Array(COLS).fill(0)); }); }
 
-/* find and return all filled rows indices */
-function findFilledRows(){
-  const filled=[];
-  for(let r=0;r<ROWS;r++){
-    if(board[r].every(cell=>cell===1)) filled.push(r);
-  }
-  return filled;
-}
-
-/* clear rows and shift above down (we will simply set cleared rows to 0 and shift rows above down) */
-function clearRows(rows){
-  rows.sort((a,b)=>a-b);
-  for(const r of rows){
-    // remove row r and add empty row at top
-    board.splice(r,1);
-    board.unshift(Array(COLS).fill(0));
-  }
-}
-
-/* draw board and pieces */
 function draw(){
-  // background
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  // pink background panel (already page background)
-  // grid
-  const gap = 2;
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const x = c*CELL_PX, y = r*CELL_PX;
-      // cell background
-      ctx.fillStyle = board[r][c] ? blockColor : boardBg;
-      ctx.fillRect(x+gap,y+gap,CELL_PX-gap*2,CELL_PX-gap*2);
-      // subtle stroke
-      ctx.strokeStyle = cellStroke;
-      ctx.strokeRect(x+gap,y+gap,CELL_PX-gap*2,CELL_PX-gap*2);
-      if(board[r][c]){
-        // small shine
-        ctx.fillStyle = "rgba(255,255,255,0.25)";
-        ctx.fillRect(x+6, y+6, CELL_PX-24, 10);
-      }
-    }
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const x=c*CELL_PX, y=r*CELL_PX;
+    ctx.fillStyle=board[r][c]?blockColor:boardBg;
+    ctx.fillRect(x+2,y+2,CELL_PX-4,CELL_PX-4);
+    ctx.strokeStyle=cellStroke; ctx.strokeRect(x+2,y+2,CELL_PX-4,CELL_PX-4);
   }
-
-  // draw upcoming pieces inside their slots (small previews)
-  for(let i=0;i<3;i++){
-    const slot = document.getElementById('slot'+i);
-    slot.innerHTML = ""; // clear
-    const piece = upcoming[i];
-    if(!piece) continue;
-    // create mini canvas
-    const mini = document.createElement('canvas');
-    mini.width = 120; mini.height = 90;
-    const mctx = mini.getContext('2d');
-    // calculate cell size for preview
-    const maxX = Math.max(...piece.map(a=>a[0])), maxY = Math.max(...piece.map(a=>a[1]));
-    const cell = Math.min(20, Math.floor(Math.min(mini.width/(maxX+2), mini.height/(maxY+2))));
-    const offsetX = Math.floor((mini.width - cell*(maxX+1))/2);
-    const offsetY = Math.floor((mini.height - cell*(maxY+1))/2);
-    // draw each block
+  // preview piece
+  if(selectedIndex!==null){
+    const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
+    ctx.fillStyle="rgba(0,0,0,0.2)";
     piece.forEach(([x,y])=>{
-      mctx.fillStyle = blockColor;
-      mctx.fillRect(offsetX + x*cell + 2, offsetY + y*cell + 2, cell-4, cell-4);
-      mctx.fillStyle = "rgba(255,255,255,0.25)";
-      mctx.fillRect(offsetX + x*cell + 4, offsetY + y*cell + 4, Math.max(2,cell-8), Math.min(8,cell-4));
+      const rr=previewRow+y, cc=previewCol+x;
+      if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS) ctx.fillRect(cc*CELL_PX+6, rr*CELL_PX+6, CELL_PX-12, CELL_PX-12);
     });
+  }
+  // slots
+  for(let i=0;i<3;i++){
+    const slot=document.getElementById('slot'+i); slot.innerHTML="";
+    const piece=upcoming[i]; if(!piece) continue;
+    const mini=document.createElement('canvas'); mini.width=120; mini.height=90;
+    const mctx=mini.getContext('2d');
+    const maxX=Math.max(...piece.map(a=>a[0])), maxY=Math.max(...piece.map(a=>a[1]));
+    const cell=Math.min(20,Math.floor(Math.min(mini.width/(maxX+2), mini.height/(maxY+2))));
+    const ox=(mini.width-cell*(maxX+1))/2, oy=(mini.height-cell*(maxY+1))/2;
+    piece.forEach(([x,y])=>{ mctx.fillStyle=blockColor; mctx.fillRect(ox+x*cell+2, oy+y*cell+2, cell-4, cell-4); });
     slot.appendChild(mini);
   }
 }
-
-/* update score displays and highscore */
 function updateScoreDisplay(){
-  document.getElementById('score').textContent = score;
-  if(score > highscore){
-    highscore = score;
-    localStorage.setItem('allisonsBlocksHighscore', String(highscore));
-    document.getElementById('highscoreDisplay').textContent = "Highscore: " + highscore;
-    document.getElementById('aboveScore').textContent = "Highscore: " + highscore;
-  } else {
-    document.getElementById('aboveScore').textContent = "Highscore: " + highscore;
-  }
+  document.getElementById('score').textContent=score;
+  if(score>highscore){ highscore=score; localStorage.setItem('allisonsBlocksHighscore', highscore); }
+  document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;
+  document.getElementById('aboveScore').textContent="Highscore: "+highscore;
 }
-
-/* after placing, handle clears and scoring */
 function postPlacement(){
-  // base points = number of cells in last placed piece (each block placed = 1 point)
-  // BUT requirement: "every block placed is one point." So we added scoring when placing.
-  // Check filled rows
-  const filled = findFilledRows();
-  if(filled.length>0){
-    // award 2 points per row cleared (spec says "Every time a row is filled... user gets 2 points" - ambiguous whether per row or total. We'll treat as 2 points per cleared row.)
-    const gained = 2 * filled.length;
-    score += gained;
-    clearRows(filled);
-    // after clearing, if board empty, award 3 points
-    if(board.flat().every(x=>x===0)){
-      score += 3;
-      // small celebration
-      flashBoard();
-    }
-  }
+  const filled=findFilledRows(); if(filled.length){ score+=2*filled.length; clearRows(filled);
+    if(board.flat().every(x=>x===0)) score+=3; }
   updateScoreDisplay();
 }
-
-/* generate upcoming pieces, ensuring at least one valid placement */
 function refillUpcoming(){
-  for(let i=0;i<3;i++){
-    if(!upcoming[i]){
-      let attempts = 0;
-      do{
-        upcoming[i] = generatePiece(difficultyLevel);
-        attempts++;
-        if(attempts>50){
-          // fallback: single block
-          upcoming[i] = [[0,0]];
-          break;
-        }
-      } while(!ensurePlayableSet([upcoming[i]]));
-    }
-  }
-  // extra safety: ensure set has at least one valid placement
-  if(!ensurePlayableSet(upcoming)){
-    // replace a random slot with a small piece that fits
-    for(let i=0;i<3;i++){
-      if(findAnyValidPlacement([[0,0]])!==null){ upcoming[i]=[[0,0]]; break; }
-    }
-  }
+  for(let i=0;i<3;i++) if(!upcoming[i]) upcoming[i]=generatePiece(difficultyLevel);
+  if(!upcoming.some(p=>p&&findAnyValidPlacement(p))) upcoming[0]=[[0,0]];
   draw();
 }
+function rotatePiece(piece,rot){ let p=piece.map(a=>[...a]); for(let i=0;i<rot;i++){ p=p.map(([x,y])=>[y,-x]); let minx=Math.min(...p.map(a=>a[0])),miny=Math.min(...p.map(a=>a[1])); p=p.map(([x,y])=>[x-minx,y-miny]); } return p; }
 
-/* placement flow by clicking: pick a slot -> choose cell to place anchor */
-canvas.addEventListener('click', (ev)=>{
-  const rect=canvas.getBoundingClientRect();
-  const x = ev.clientX - rect.left;
-  const y = ev.clientY - rect.top;
-  const col = Math.floor(x / CELL_PX), row = Math.floor(y / CELL_PX);
-  if(selectedIndex === null){
-    // pick piece by clicking a slot? If click on board while none selected, do nothing
-    return;
-  }
-  // try placement with current rotation
-  const piece = rotatePiece(upcoming[selectedIndex], selectedRotation);
-  if(canPlace(piece, row, col)){
-    placePiece(piece, row, col);
-    // scoring: each block placed is 1 point
-    score += piece.length;
-    placementsCount++;
-    if(placementsCount % 10 === 0){
-      difficultyLevel++;
-    }
-    // consume piece
-    upcoming[selectedIndex] = null;
-    selectedIndex = null;
-    selectedRotation = 0;
-    postPlacement();
-    refillUpcoming();
-    draw();
-  } else {
-    // small feedback: shake or flash
-    flashCell(row, col);
-  }
+/* click placement */
+canvas.addEventListener('click',ev=>{
+  if(selectedIndex===null) return;
+  const rect=canvas.getBoundingClientRect(), col=Math.floor((ev.clientX-rect.left)/CELL_PX), row=Math.floor((ev.clientY-rect.top)/CELL_PX);
+  const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
+  if(canPlace(piece,row,col)){ placePiece(piece,row,col); score+=piece.length; placementsCount++; if(placementsCount%10===0) difficultyLevel++; upcoming[selectedIndex]=null; selectedIndex=null; postPlacement(); refillUpcoming(); draw(); }
 });
 
-/* click handler for upcoming slots */
-for(let i=0;i<3;i++){
-  document.getElementById('slot'+i).addEventListener('click', ()=> {
-    selectedIndex = i;
-    selectedRotation = 0;
-    // visual feedback by adding border
-    for(let j=0;j<3;j++){
-      document.getElementById('slot'+j).style.boxShadow = (j===i) ? "0 6px 20px rgba(123,60,167,0.12) inset" : "none";
-    }
-  });
-}
+/* slot click */
+for(let i=0;i<3;i++) document.getElementById('slot'+i).addEventListener('click',()=>{selectedIndex=i;selectedRotation=0;previewRow=0;previewCol=0;draw();});
 
-/* rotate preview button */
-document.getElementById('rotateBtn').addEventListener('click', ()=>{
-  selectedRotation = (selectedRotation + 1) % 4;
-});
+/* buttons */
+document.getElementById('rotateBtn').onclick=()=>{selectedRotation=(selectedRotation+1)%4; draw();};
+document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);refillUpcoming();updateScoreDisplay();draw();};
+document.getElementById('hintBtn').onclick=()=>{for(const p of upcoming){const pos=findAnyValidPlacement(p);if(pos){ctx.fillStyle="rgba(91,40,168,0.14)";p.forEach(([x,y])=>ctx.fillRect((pos[1]+x)*CELL_PX+4,(pos[0]+y)*CELL_PX+4,CELL_PX-8,CELL_PX-8));setTimeout(draw,600);break;}}};
 
-/* reset board */
-document.getElementById('clearBtn').addEventListener('click', ()=>{
-  board = Array.from({length:ROWS},()=>Array(COLS).fill(0));
-  score = 0;
-  placementsCount = 0;
-  difficultyLevel = 0;
-  upcoming.splice(0, upcoming.length, null, null, null);
-  refillUpcoming();
-  updateScoreDisplay();
-  draw();
-});
+/* modal */
+document.getElementById('instrBtn').onclick=()=>modal.style.display="flex";
+document.getElementById('closeModal').onclick=()=>modal.style.display="none";
+modal.onclick=e=>{if(e.target===modal) modal.style.display="none";};
 
-/* hint button: briefly shows one valid spot for first upcoming piece */
-document.getElementById('hintBtn').addEventListener('click', ()=>{
-  for(let i=0;i<3;i++){
-    const piece = upcoming[i];
-    const pos = findAnyValidPlacement(piece);
-    if(pos){
-      highlightCellsForPiece(piece, pos[0], pos[1], 600);
-      break;
+/* keyboard controls */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.key==="1"||e.key==="2"||e.key==="3"){selectedIndex=Number(e.key)-1;selectedRotation=0;previewRow=0;previewCol=0;draw();}
+  else if(e.key==="r"||e.key==="R"){if(selectedIndex!==null){selectedRotation=(selectedRotation+1)%4;draw();}}
+  else if(e.key==="ArrowUp"){if(selectedIndex!==null) previewRow=Math.max(0,previewRow-1), draw();}
+  else if(e.key==="ArrowDown"){if(selectedIndex!==null) previewRow=Math.min(ROWS-1,previewRow+1), draw();}
+  else if(e.key==="ArrowLeft"){if(selectedIndex!==null) previewCol=Math.max(0,previewCol-1), draw();}
+  else if(e.key==="ArrowRight"){if(selectedIndex!==null) previewCol=Math.min(COLS-1,previewCol+1), draw();}
+  else if(e.key==="Escape"){selectedIndex=null; draw();}
+  else if(e.key==="Enter"||e.key===" "){
+    if(selectedIndex!==null){
+      const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
+      if(canPlace(piece,previewRow,previewCol)){
+        placePiece(piece,previewRow,previewCol);
+        score+=piece.length; placementsCount++; if(placementsCount%10===0) difficultyLevel++;
+        upcoming[selectedIndex]=null; selectedIndex=null; postPlacement(); refillUpcoming(); draw();
+      }
     }
   }
 });
 
-/* visual helpers */
-function flashBoard(){
-  const prev = canvas.style.boxShadow;
-  canvas.style.boxShadow = "0 0 40px 10px rgba(180,120,255,0.28)";
-  setTimeout(()=>canvas.style.boxShadow = prev, 500);
-}
-function flashCell(r,c){
-  const x = c*CELL_PX, y = r*CELL_PX;
-  ctx.fillStyle = "rgba(255,0,80,0.18)";
-  ctx.fillRect(x+4,y+4,CELL_PX-8,CELL_PX-8);
-  setTimeout(draw,120);
-}
-function highlightCellsForPiece(piece,r,c,duration=600){
-  draw();
-  ctx.fillStyle = "rgba(91,40,168,0.14)";
-  piece.forEach(([x,y])=>{
-    const rr = r + y, cc = c + x;
-    ctx.fillRect(cc*CELL_PX+4, rr*CELL_PX+4, CELL_PX-8, CELL_PX-8);
-  });
-  setTimeout(draw,duration);
-}
-
-/* rotate piece given rotation count 0..3 */
-function rotatePiece(piece, rot){
-  if(rot===0) return piece.map(a=>[...a]);
-  let p = piece.map(a=>[...a]);
-  for(let i=0;i<rot;i++){
-    p = p.map(([x,y])=>[y,-x]);
-    // normalize to min coords 0
-    const minx=Math.min(...p.map(a=>a[0])), miny=Math.min(...p.map(a=>a[1]));
-    p = p.map(([x,y])=>[x-minx,y-miny]);
-  }
-  return p;
-}
-
-/* initial populate upcoming and draw loop */
-function init(){
-  // fill upcoming - use difficulty
-  for(let i=0;i<3;i++){
-    upcoming[i] = generatePiece(difficultyLevel);
-  }
-  // ensure set playable
-  if(!ensurePlayableSet(upcoming)){
-    upcoming[0] = [[0,0]];
-  }
-  draw();
-}
-init();
-
-/* UI: modal instructions */
-const instrBtn = document.getElementById('instrBtn');
-const modal = document.getElementById('modal');
-const closeModal = document.getElementById('closeModal');
-instrBtn.addEventListener('click', ()=> modal.style.display = "flex");
-closeModal.addEventListener('click', ()=> modal.style.display = "none");
-modal.addEventListener('click', (e)=> { if(e.target === modal) modal.style.display = "none"; });
-
-/* game autosave highscore periodically */
-setInterval(()=>{ localStorage.setItem('allisonsBlocksHighscore', String(highscore)); }, 5000);
-
-/* paint loop for hover preview */
-canvas.addEventListener('mousemove', (ev)=>{
-  draw();
-  if(selectedIndex === null) return;
-  const rect=canvas.getBoundingClientRect();
-  const x = ev.clientX - rect.left;
-  const y = ev.clientY - rect.top;
-  const col = Math.floor(x / CELL_PX), row = Math.floor(y / CELL_PX);
-  const piece = rotatePiece(upcoming[selectedIndex], selectedRotation);
-  // preview in lighter tone
-  ctx.globalAlpha = 0.95;
-  ctx.fillStyle = "rgba(191,233,255,0.9)";
-  piece.forEach(([px,py])=>{
-    const rr = row + py, cc = col + px;
-    if(rr<0 || rr>=ROWS || cc<0 || cc>=COLS) return;
-    ctx.fillRect(cc*CELL_PX+6, rr*CELL_PX+6, CELL_PX-12, CELL_PX-12);
-  });
-  ctx.globalAlpha = 1;
-});
-
-/* place by double-click to pick and then click empty; also support dragging not implemented for brevity */
-canvas.addEventListener('dblclick', (ev)=>{
-  // if double click and there is a selected piece, try place at that anchor
-  const rect=canvas.getBoundingClientRect();
-  const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
-  const col = Math.floor(x / CELL_PX), row = Math.floor(y / CELL_PX);
-  if(selectedIndex !== null){
-    const piece = rotatePiece(upcoming[selectedIndex], selectedRotation);
-    if(canPlace(piece,row,col)){
-      placePiece(piece,row,col);
-      score += piece.length;
-      placementsCount++;
-      if(placementsCount % 10 === 0) difficultyLevel++;
-      upcoming[selectedIndex] = null;
-      selectedIndex=null; selectedRotation=0;
-      postPlacement(); refillUpcoming(); draw();
-    }
-  }
-});
-
-/* simple animation loop for polishing */
-setInterval(()=> draw(), 900);
-
-/* ensure upcoming always refilled */
-setInterval(()=> refillUpcoming(), 500);
-
-/* ==== AUDIO: default ambient synth (no copyrighted music) ==== */
-/* If you want to use a specific track you have rights to, set audioSrc variable near top to its URL.
-   I cannot include copyrighted songs. */
-let audioCtx=null, masterGain=null, audioPlaying=false, bufferSource=null;
-const musicBtn = document.getElementById('musicBtn');
-
-function startSynthLoop(){
-  if(audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.12;
-  masterGain.connect(audioCtx.destination);
-
-  // create a gentle pad using two oscillators + reverb-ish delay
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const g1 = audioCtx.createGain();
-  const g2 = audioCtx.createGain();
-
-  osc1.type = "sine"; osc2.type = "sine";
-  osc1.frequency.value = 220; osc2.frequency.value = 330;
-  g1.gain.value = 0.035; g2.gain.value = 0.025;
-
-  const merger = audioCtx.createGain();
-  merger.gain.value = 0.9;
-
-  // slow LFO to modulate filter
-  const lfo = audioCtx.createOscillator();
-  const lfoGain = audioCtx.createGain();
-  lfo.type="sine"; lfo.frequency.value = 0.1; lfoGain.gain.value = 280;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = "lowpass"; filter.frequency.value = 600;
-
-  osc1.connect(g1); osc2.connect(g2);
-  g1.connect(merger); g2.connect(merger);
-  merger.connect(filter);
-  filter.connect(masterGain);
-
-  lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
-
-  // soft pluck loop using scheduled notes for gentle variety
-  const notes = [220, 262, 294, 330, 392]; // A3, C4, D4, E4, G4
-  let t0 = audioCtx.currentTime;
-  function schedule(){
-    for(let i=0;i<notes.length;i++){
-      const when = t0 + i*1.6;
-      const env = audioCtx.createGain();
-      const osc = audioCtx.createOscillator(); osc.type="triangle"; osc.frequency.value = notes[i]*0.5;
-      env.gain.value = 0.0001;
-      osc.connect(env); env.connect(masterGain);
-      env.gain.setValueAtTime(0.0001, when);
-      env.gain.exponentialRampToValueAtTime(0.03, when+0.4);
-      env.gain.exponentialRampToValueAtTime(0.0001, when+1.4);
-      osc.start(when); osc.stop(when+1.6);
-    }
-    t0 += notes.length * 1.6;
-    // schedule again
-    setTimeout(schedule, notes.length * 1600);
-  }
-  osc1.start(); osc2.start(); lfo.start();
-  schedule();
-  audioPlaying = true;
-  musicBtn.textContent = "Music: On";
-}
-
-function stopSynth(){
-  if(!audioCtx) return;
-  audioCtx.close();
-  audioCtx = null;
-  audioPlaying = false;
-  musicBtn.textContent = "Music: Off";
-}
-
-/* If audioSrc is provided (string), create an HTML audio element; otherwise use synth */
-let externalAudio = null;
-if(audioSrc){
-  externalAudio = new Audio(audioSrc);
-  externalAudio.loop = true;
-  externalAudio.volume = 0.18;
-}
-
-/* toggle music */
-musicBtn.addEventListener('click', ()=>{
-  if(audioSrc){
-    // toggle external audio
-    if(externalAudio.paused){
-      externalAudio.play().catch(()=>alert("Unable to autoplay. Interact with the page and try again."));
-      musicBtn.textContent = "Music: On";
-    } else {
-      externalAudio.pause();
-      musicBtn.textContent = "Music: Off";
-    }
-  } else {
-    // use synth
-    if(!audioPlaying){
-      startSynthLoop();
-    } else {
-      stopSynth();
-    }
-  }
-});
-
-/* ================== ensure at least one valid move exists ================== */
-function hasAnyValidMove(){
-  for(let pi=0;pi<3;pi++){
-    const p = upcoming[pi];
-    if(!p) continue;
-    if(findAnyValidPlacement(p)) return true;
-  }
-  return false;
-}
-
-/* on each refil ensure not impossible */
-setInterval(()=>{
-  if(!hasAnyValidMove()){
-    // reduce difficulty slightly and force a small piece into the set
-    difficultyLevel = Math.max(0, difficultyLevel-1);
-    upcoming[0] = [[0,0]];
-    refillUpcoming();
-  }
-}, 800);
-
-/* keep UI updated */
-updateScoreDisplay();
-refillUpcoming();
-
+/* init */
+refillUpcoming(); updateScoreDisplay(); draw();
 </script>
 </body>
 </html>
