@@ -80,7 +80,7 @@
       <div style="background:linear-gradient(180deg,#fff,#faf6ff);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.03);">
         <div style="font-weight:800;color:var(--accent-purple)">Settings</div>
         <div style="margin-top:10px;font-size:13px;color:#5a3f9f">
-          Tip: Each placed block = <strong>+1</strong> point. Full row cleared = <strong>+2</strong>. Whole board cleared = <strong>+3</strong>.
+          Tip: Each placed block = <strong>+1</strong> point. Full row or column cleared = <strong>+2</strong>. Whole board cleared = <strong>+3</strong>.
         </div>
       </div>
     </div>
@@ -98,9 +98,9 @@
       </div>
       <div style="margin-top:10px; line-height:1.5; color:#3b2b66">
         <ul>
-          <li>Drag or click a piece from the right and place it onto the 9×9 pink board. Each placed block gives you <strong>1 point</strong>.</li>
-          <li>When a whole row becomes fully occupied, that row clears and you get <strong>2 extra points</strong>.</li>
-          <li>If the whole board becomes empty (after clears), you earn <strong>3 extra points</strong>.</li>
+          <li>Place blocks on the 9×9 board. Each block = <strong>1 point</strong>.</li>
+          <li>Fill an entire row or column to clear it and earn <strong>+2 points</strong>.</li>
+          <li>If the whole board is cleared, you earn <strong>+3 extra points</strong>.</li>
           <li>Use keyboard: 1–3 to pick piece, Arrows to move, R to rotate, Enter/Space to place, Esc to cancel.</li>
         </ul>
       </div>
@@ -108,155 +108,77 @@
   </div>
 
 <script>
-/* === GAME SCRIPT WITH KEYBOARD CONTROLS === */
-const ROWS = 9, COLS = 9, CELL_PX = 60;
-const canvas = document.getElementById('board'), ctx = canvas.getContext('2d');
+/* === GAME SCRIPT WITH COLUMN CLEARING === */
+const ROWS=9,COLS=9,CELL_PX=60;
+const canvas=document.getElementById('board'),ctx=canvas.getContext('2d');
+let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+let score=0,highscore=Number(localStorage.getItem('allisonsBlocksHighscore')||0);
+document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;
+document.getElementById('aboveScore').textContent="Highscore: "+highscore;
 
-let board = Array.from({length:ROWS},()=>Array(COLS).fill(0));
-let score = 0;
-let highscore = Number(localStorage.getItem('allisonsBlocksHighscore')||0);
-document.getElementById('highscoreDisplay').textContent = "Highscore: " + highscore;
-document.getElementById('aboveScore').textContent = "Highscore: " + highscore;
+const upcoming=[null,null,null];
+let selectedIndex=null,selectedRotation=0,placementsCount=0,difficultyLevel=0;
+let previewRow=0,previewCol=0;
 
-const upcoming = [null,null,null];
-let selectedIndex = null, selectedRotation = 0, placementsCount = 0, difficultyLevel = 0;
-let previewRow = 0, previewCol = 0;
+const blockColor="#bfe9ff",cellStroke="rgba(123,60,167,0.12)",boardBg="#ffd1e6";
 
-const blockColor = "#bfe9ff", cellStroke = "rgba(123,60,167,0.12)", boardBg = "#ffd1e6";
-
-const BASE_SHAPES = [
+const BASE_SHAPES=[
   [[0,0]], [[0,0],[1,0]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[1,0]],
   [[0,0],[1,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[1,1]],
   [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0],[3,0]],
   [[0,0],[1,0],[2,0],[2,1]], [[0,0],[1,0],[1,1],[2,1]],
   [[0,0],[0,1],[1,1],[1,2]], [[0,0],[1,0],[0,1],[0,2]]
 ];
-
-function getRotations(shape){
-  let res=[shape];
-  for(let i=1;i<4;i++) res.push(res[i-1].map(([x,y])=>[y,-x]));
-  return res.map(s=>{
-    let minx=Math.min(...s.map(a=>a[0])), miny=Math.min(...s.map(a=>a[1]));
-    return s.map(([x,y])=>[x-minx,y-miny]);
-  });
-}
-function generatePiece(dLevel){
-  const pool=[]; BASE_SHAPES.forEach(s=>{
-    const w = Math.max(1, s.length + Math.floor(dLevel/3) - (s.length>3?1:0));
-    for(let i=0;i<w;i++) pool.push(s);
-  });
-  const rotations=getRotations(pool[Math.floor(Math.random()*pool.length)]);
-  return rotations[Math.floor(Math.random()*rotations.length)];
-}
-function canPlace(piece,r,c){
-  for(const [x,y] of piece){
-    const rr=r+y, cc=c+x;
-    if(rr<0||rr>=ROWS||cc<0||cc>=COLS) return false;
-    if(board[rr][cc]) return false;
-  }
-  return true;
-}
-function placePiece(piece,r,c){ for(const [x,y] of piece) board[r+y][c+x]=1; }
-function findAnyValidPlacement(piece){
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(canPlace(piece,r,c)) return [r,c];
-  return null;
-}
-function findFilledRows(){ return [...Array(ROWS).keys()].filter(r=>board[r].every(c=>c===1)); }
-function clearRows(rows){ rows.sort((a,b)=>a-b).forEach(r=>{ board.splice(r,1); board.unshift(Array(COLS).fill(0)); }); }
-
+function getRotations(shape){let res=[shape];for(let i=1;i<4;i++)res.push(res[i-1].map(([x,y])=>[y,-x]));return res.map(s=>{let minx=Math.min(...s.map(a=>a[0])),miny=Math.min(...s.map(a=>a[1]));return s.map(([x,y])=>[x-minx,y-miny]);});}
+function generatePiece(dLevel){const pool=[];BASE_SHAPES.forEach(s=>{const w=Math.max(1,s.length+Math.floor(dLevel/3)-(s.length>3?1:0));for(let i=0;i<w;i++)pool.push(s);});const rotations=getRotations(pool[Math.floor(Math.random()*pool.length)]);return rotations[Math.floor(Math.random()*rotations.length)];}
+function canPlace(piece,r,c){for(const [x,y] of piece){const rr=r+y,cc=c+x;if(rr<0||rr>=ROWS||cc<0||cc>=COLS)return false;if(board[rr][cc])return false;}return true;}
+function placePiece(piece,r,c){for(const [x,y] of piece)board[r+y][c+x]=1;}
+function findAnyValidPlacement(piece){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(canPlace(piece,r,c))return [r,c];return null;}
+function findFilledRows(){return [...Array(ROWS).keys()].filter(r=>board[r].every(c=>c===1));}
+function findFilledCols(){return [...Array(COLS).keys()].filter(c=>board.every(row=>row[c]===1));}
+function clearRowsAndCols(rows,cols){rows.forEach(r=>board[r].fill(0));cols.forEach(c=>board.forEach(row=>row[c]=0));}
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    const x=c*CELL_PX, y=r*CELL_PX;
-    ctx.fillStyle=board[r][c]?blockColor:boardBg;
-    ctx.fillRect(x+2,y+2,CELL_PX-4,CELL_PX-4);
-    ctx.strokeStyle=cellStroke; ctx.strokeRect(x+2,y+2,CELL_PX-4,CELL_PX-4);
-  }
-  // preview piece
-  if(selectedIndex!==null){
-    const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
-    ctx.fillStyle="rgba(0,0,0,0.2)";
-    piece.forEach(([x,y])=>{
-      const rr=previewRow+y, cc=previewCol+x;
-      if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS) ctx.fillRect(cc*CELL_PX+6, rr*CELL_PX+6, CELL_PX-12, CELL_PX-12);
-    });
-  }
-  // slots
-  for(let i=0;i<3;i++){
-    const slot=document.getElementById('slot'+i); slot.innerHTML="";
-    const piece=upcoming[i]; if(!piece) continue;
-    const mini=document.createElement('canvas'); mini.width=120; mini.height=90;
-    const mctx=mini.getContext('2d');
-    const maxX=Math.max(...piece.map(a=>a[0])), maxY=Math.max(...piece.map(a=>a[1]));
-    const cell=Math.min(20,Math.floor(Math.min(mini.width/(maxX+2), mini.height/(maxY+2))));
-    const ox=(mini.width-cell*(maxX+1))/2, oy=(mini.height-cell*(maxY+1))/2;
-    piece.forEach(([x,y])=>{ mctx.fillStyle=blockColor; mctx.fillRect(ox+x*cell+2, oy+y*cell+2, cell-4, cell-4); });
-    slot.appendChild(mini);
-  }
-}
-function updateScoreDisplay(){
-  document.getElementById('score').textContent=score;
-  if(score>highscore){ highscore=score; localStorage.setItem('allisonsBlocksHighscore', highscore); }
-  document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;
-  document.getElementById('aboveScore').textContent="Highscore: "+highscore;
-}
-function postPlacement(){
-  const filled=findFilledRows(); if(filled.length){ score+=2*filled.length; clearRows(filled);
-    if(board.flat().every(x=>x===0)) score+=3; }
-  updateScoreDisplay();
-}
-function refillUpcoming(){
-  for(let i=0;i<3;i++) if(!upcoming[i]) upcoming[i]=generatePiece(difficultyLevel);
-  if(!upcoming.some(p=>p&&findAnyValidPlacement(p))) upcoming[0]=[[0,0]];
-  draw();
-}
-function rotatePiece(piece,rot){ let p=piece.map(a=>[...a]); for(let i=0;i<rot;i++){ p=p.map(([x,y])=>[y,-x]); let minx=Math.min(...p.map(a=>a[0])),miny=Math.min(...p.map(a=>a[1])); p=p.map(([x,y])=>[x-minx,y-miny]); } return p; }
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const x=c*CELL_PX,y=r*CELL_PX;ctx.fillStyle=board[r][c]?blockColor:boardBg;ctx.fillRect(x+2,y+2,CELL_PX-4,CELL_PX-4);ctx.strokeStyle=cellStroke;ctx.strokeRect(x+2,y+2,CELL_PX-4,CELL_PX-4);}
+  if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);ctx.fillStyle="rgba(0,0,0,0.2)";piece.forEach(([x,y])=>{const rr=previewRow+y,cc=previewCol+x;if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS)ctx.fillRect(cc*CELL_PX+6,rr*CELL_PX+6,CELL_PX-12,CELL_PX-12);});}
+  for(let i=0;i<3;i++){const slot=document.getElementById('slot'+i);slot.innerHTML="";const piece=upcoming[i];if(!piece)continue;const mini=document.createElement('canvas');mini.width=120;mini.height=90;const mctx=mini.getContext('2d');const maxX=Math.max(...piece.map(a=>a[0])),maxY=Math.max(...piece.map(a=>a[1]));const cell=Math.min(20,Math.floor(Math.min(mini.width/(maxX+2),mini.height/(maxY+2))));const ox=(mini.width-cell*(maxX+1))/2,oy=(mini.height-cell*(maxY+1))/2;piece.forEach(([x,y])=>{mctx.fillStyle=blockColor;mctx.fillRect(ox+x*cell+2,oy+y*cell+2,cell-4,cell-4);});slot.appendChild(mini);}}
+function updateScoreDisplay(){document.getElementById('score').textContent=score;if(score>highscore){highscore=score;localStorage.setItem('allisonsBlocksHighscore',highscore);}document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;document.getElementById('aboveScore').textContent="Highscore: "+highscore;}
+function postPlacement(){const filledRows=findFilledRows();const filledCols=findFilledCols();if(filledRows.length||filledCols.length){score+=2*(filledRows.length+filledCols.length);clearRowsAndCols(filledRows,filledCols);if(board.flat().every(x=>x===0))score+=3;}updateScoreDisplay();}
+function refillUpcoming(){for(let i=0;i<3;i++)if(!upcoming[i])upcoming[i]=generatePiece(difficultyLevel);if(!upcoming.some(p=>p&&findAnyValidPlacement(p)))upcoming[0]=[[0,0]];draw();}
+function rotatePiece(piece,rot){let p=piece.map(a=>[...a]);for(let i=0;i<rot;i++){p=p.map(([x,y])=>[y,-x]);let minx=Math.min(...p.map(a=>a[0])),miny=Math.min(...p.map(a=>a[1]));p=p.map(([x,y])=>[x-minx,y-miny]);}return p;}
 
-/* click placement */
-canvas.addEventListener('click',ev=>{
-  if(selectedIndex===null) return;
-  const rect=canvas.getBoundingClientRect(), col=Math.floor((ev.clientX-rect.left)/CELL_PX), row=Math.floor((ev.clientY-rect.top)/CELL_PX);
-  const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
-  if(canPlace(piece,row,col)){ placePiece(piece,row,col); score+=piece.length; placementsCount++; if(placementsCount%10===0) difficultyLevel++; upcoming[selectedIndex]=null; selectedIndex=null; postPlacement(); refillUpcoming(); draw(); }
-});
+/* canvas click */
+canvas.addEventListener('click',ev=>{if(selectedIndex===null)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((ev.clientX-rect.left)/CELL_PX),row=Math.floor((ev.clientY-rect.top)/CELL_PX);const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,row,col)){placePiece(piece,row,col);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}});
 
 /* slot click */
-for(let i=0;i<3;i++) document.getElementById('slot'+i).addEventListener('click',()=>{selectedIndex=i;selectedRotation=0;previewRow=0;previewCol=0;draw();});
+for(let i=0;i<3;i++)document.getElementById('slot'+i).addEventListener('click',()=>{selectedIndex=i;selectedRotation=0;previewRow=0;previewCol=0;draw();});
 
 /* buttons */
-document.getElementById('rotateBtn').onclick=()=>{selectedRotation=(selectedRotation+1)%4; draw();};
+document.getElementById('rotateBtn').onclick=()=>{selectedRotation=(selectedRotation+1)%4;draw();};
 document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);refillUpcoming();updateScoreDisplay();draw();};
 document.getElementById('hintBtn').onclick=()=>{for(const p of upcoming){const pos=findAnyValidPlacement(p);if(pos){ctx.fillStyle="rgba(91,40,168,0.14)";p.forEach(([x,y])=>ctx.fillRect((pos[1]+x)*CELL_PX+4,(pos[0]+y)*CELL_PX+4,CELL_PX-8,CELL_PX-8));setTimeout(draw,600);break;}}};
 
 /* modal */
 document.getElementById('instrBtn').onclick=()=>modal.style.display="flex";
 document.getElementById('closeModal').onclick=()=>modal.style.display="none";
-modal.onclick=e=>{if(e.target===modal) modal.style.display="none";};
+modal.onclick=e=>{if(e.target===modal)modal.style.display="none";};
 
 /* keyboard controls */
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
   if(e.key==="1"||e.key==="2"||e.key==="3"){selectedIndex=Number(e.key)-1;selectedRotation=0;previewRow=0;previewCol=0;draw();}
   else if(e.key==="r"||e.key==="R"){if(selectedIndex!==null){selectedRotation=(selectedRotation+1)%4;draw();}}
-  else if(e.key==="ArrowUp"){if(selectedIndex!==null) previewRow=Math.max(0,previewRow-1), draw();}
-  else if(e.key==="ArrowDown"){if(selectedIndex!==null) previewRow=Math.min(ROWS-1,previewRow+1), draw();}
-  else if(e.key==="ArrowLeft"){if(selectedIndex!==null) previewCol=Math.max(0,previewCol-1), draw();}
-  else if(e.key==="ArrowRight"){if(selectedIndex!==null) previewCol=Math.min(COLS-1,previewCol+1), draw();}
-  else if(e.key==="Escape"){selectedIndex=null; draw();}
-  else if(e.key==="Enter"||e.key===" "){
-    if(selectedIndex!==null){
-      const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);
-      if(canPlace(piece,previewRow,previewCol)){
-        placePiece(piece,previewRow,previewCol);
-        score+=piece.length; placementsCount++; if(placementsCount%10===0) difficultyLevel++;
-        upcoming[selectedIndex]=null; selectedIndex=null; postPlacement(); refillUpcoming(); draw();
-      }
-    }
-  }
+  else if(e.key==="ArrowUp"){if(selectedIndex!==null)previewRow=Math.max(0,previewRow-1),draw();}
+  else if(e.key==="ArrowDown"){if(selectedIndex!==null)previewRow=Math.min(ROWS-1,previewRow+1),draw();}
+  else if(e.key==="ArrowLeft"){if(selectedIndex!==null)previewCol=Math.max(0,previewCol-1),draw();}
+  else if(e.key==="ArrowRight"){if(selectedIndex!==null)previewCol=Math.min(COLS-1,previewCol+1),draw();}
+  else if(e.key==="Escape"){selectedIndex=null;draw();}
+  else if(e.key==="Enter"||e.key===" "){if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,previewRow,previewCol)){placePiece(piece,previewRow,previewCol);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}}}
 });
 
 /* init */
-refillUpcoming(); updateScoreDisplay(); draw();
+refillUpcoming();updateScoreDisplay();draw();
 </script>
 </body>
 </html>
+
