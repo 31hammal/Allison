@@ -9,90 +9,34 @@
     --bg1: #ffedf3;
     --pink: #ffd6e6;
     --block: #cfe9ff;
-    --gold1: linear-gradient(90deg,#ffd700,#ffcc33);
     --gold-text: #b8860b;
-    --shiny: rgba(255,215,0,0.9);
-    --glass: rgba(255,255,255,0.12);
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#ff80ab 0%,#ffd700 100%);color:#222}
-  .app{
-    max-width:1100px;margin:24px auto;padding:20px;border-radius:18px;
-    background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02));
-    box-shadow:0 10px 30px rgba(0,0,0,0.15);
-    border:2px solid rgba(255,215,0,0.18);
-  }
-
-  header{
-    display:flex;align-items:center;gap:18px;justify-content:space-between;
-    padding:8px 12px;margin-bottom:12px;
-  }
-  .profile-pic {
-    width:50px;height:50px;border-radius:50%;object-fit:cover;
-    border:2px solid rgba(255,215,0,0.6);
-  }
-  .title {
-    text-align:left;flex-grow:1;
-  }
-  .title h1{
-    margin:0;font-size:28px;line-height:1;
-    background:linear-gradient(270deg,#ffd700,#ff80ab,#ffd700);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    font-weight:800;
-    text-shadow:0 1px 0 rgba(0,0,0,0.08);
-  }
-
-  /* scoreboard */
+  .app{max-width:1100px;margin:24px auto;padding:20px;border-radius:18px;background:rgba(255,255,255,0.12);box-shadow:0 10px 30px rgba(0,0,0,0.15);border:2px solid rgba(255,215,0,0.18);}
+  header{display:flex;align-items:center;gap:18px;justify-content:space-between;padding:8px 12px;margin-bottom:12px;}
+  .profile-pic{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,215,0,0.6);}
+  .title{text-align:left;flex-grow:1;}
+  .title h1{margin:0;font-size:28px;line-height:1;background:linear-gradient(270deg,#ffd700,#ff80ab,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;text-shadow:0 1px 0 rgba(0,0,0,0.08);}
   .hud{display:flex;gap:12px;align-items:center;}
-  .stat{
-    background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    border:2px solid rgba(255,215,0,0.18);
-    padding:10px 14px;border-radius:12px;min-width:120px;text-align:center;
-    box-shadow:0 6px 18px rgba(255,215,0,0.06);
-  }
+  .stat{background:rgba(255,255,255,0.06);border:2px solid rgba(255,215,0,0.18);padding:10px 14px;border-radius:12px;min-width:120px;text-align:center;box-shadow:0 6px 18px rgba(255,215,0,0.06);}
   .stat h3{margin:0;font-size:12px;color:var(--gold-text);font-weight:700}
   .stat p{margin:6px 0 0;font-size:18px;font-weight:800;color:#fff}
-
-  /* layout */
   .game-row{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
-  /* board */
   .board-wrap{background:var(--pink);padding:14px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.12);border:2px solid rgba(255,215,0,0.12)}
-  .grid{
-    display:grid;grid-template-columns:repeat(9,38px);grid-auto-rows:38px;gap:6px;
-    padding:6px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-  }
-  .cell{
-    width:38px;height:38px;border-radius:6px;background:transparent;border:2px dashed rgba(255,255,255,0.08);
-    display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;
-    transition:transform .08s ease;
-  }
+  .grid{display:grid;grid-template-columns:repeat(9,38px);grid-auto-rows:38px;gap:6px;padding:6px;background:rgba(255,255,255,0.02);}
+  .cell{width:38px;height:38px;border-radius:6px;background:transparent;border:2px dashed rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;transition:transform .08s ease;}
   .cell.occupied{background:var(--block);border:none;box-shadow:0 6px 12px rgba(0,0,0,0.12), inset 0 -6px 12px rgba(255,255,255,0.08)}
-
-  /* upcoming pieces area */
   .pieces{display:flex;flex-direction:column;gap:14px;align-items:center;min-width:220px;}
-  .piece-slot{
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-    padding:12px;border-radius:12px;border:2px solid rgba(255,215,0,0.12);min-width:190px;
-    display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;
-  }
-  .piece{
-    width:100px;height:60px;display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:12px;gap:4px;align-items:center;justify-items:center;
-    position:relative;cursor:pointer;border-radius:8px;transition:transform .12s ease,box-shadow .12s;
-  }
+  .piece-slot{background:rgba(255,255,255,0.02);padding:12px;border-radius:12px;border:2px solid rgba(255,215,0,0.12);min-width:190px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .piece{width:100px;height:60px;display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:12px;gap:4px;align-items:center;justify-items:center;cursor:pointer;border-radius:8px;transition:transform .12s ease,box-shadow .12s;}
   .piece.selected{box-shadow:0 8px 30px rgba(255,215,0,0.18);transform:translateY(-4px)}
   .cell-mini{width:12px;height:12px;border-radius:2px;background:var(--block);box-shadow:0 4px 6px rgba(0,0,0,0.08)}
   .controls{display:flex;flex-direction:column;gap:8px;align-items:center}
-
-  .btn{
-    background:linear-gradient(90deg,#ffcc33,#ffd700);border:none;padding:8px 12px;border-radius:10px;font-weight:800;color:#3a2a00;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.12)
-  }
+  .btn{background:linear-gradient(90deg,#ffcc33,#ffd700);border:none;padding:8px 12px;border-radius:10px;font-weight:800;color:#3a2a00;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.12)}
   .btn.secondary{background:transparent;border:2px solid rgba(255,255,255,0.06);color:#fff;font-weight:700}
-
   footer{margin-top:18px;text-align:center;}
-  footer .color-bar{
-    display:inline-block;padding:6px 60px;border-radius:20px;
-    background:linear-gradient(90deg,#ffd700,#ffcc33,#ff80ab);
-  }
+  footer .color-bar{display:inline-block;padding:6px 60px;border-radius:20px;background:linear-gradient(90deg,#ffd700,#ffcc33,#ff80ab);}
 </style>
 </head>
 <body>
@@ -152,20 +96,173 @@ musicBtn.addEventListener('click', ()=>{
   playing = !playing;
 });
 
-/* ---- YOUR ORIGINAL GAME LOGIC (unchanged) ---- */
-/* This is where all the Block Blast code you already had stays intact:
-   - board + grid building
-   - shapes + variants
-   - rendering pieces
-   - placing, scoring, row clearing
-   - high score storage
-   - shuffle and reset
-   - keyboard + touch controls
-   Everything continues to work.
-*/
+/* ---- GAME LOGIC ---- */
+const gridSize = 9;
+const grid = document.getElementById("grid");
+const piecesArea = document.getElementById("piecesArea");
+const scoreEl = document.getElementById("score");
+const highScoreEl = document.getElementById("highScore");
 
-// (Paste all your existing JavaScript logic for the game here. I’ve kept everything in place.)
+let board = Array.from({length:gridSize}, ()=>Array(gridSize).fill(0));
+let score = 0;
+let highScore = parseInt(localStorage.getItem("highScore"))||0;
+highScoreEl.textContent = highScore;
+let selectedPiece = null;
+
+const shapes = [
+  [[1]], [[1,1]], [[1,1,1]], [[1],[1]], [[1],[1],[1]],
+  [[1,1],[1,1]], [[1,1,1],[0,1,0]], [[1,1,1,1]],
+  [[1],[1],[1],[1]], [[1,1,0],[0,1,1]], [[0,1,1],[1,1,0]]
+];
+
+/* build board */
+function buildBoard(){
+  grid.innerHTML="";
+  for(let r=0;r<gridSize;r++){
+    for(let c=0;c<gridSize;c++){
+      const cell=document.createElement("div");
+      cell.className="cell";
+      if(board[r][c]) cell.classList.add("occupied");
+      cell.dataset.row=r; cell.dataset.col=c;
+      cell.addEventListener("click",()=>placePiece(r,c));
+      grid.appendChild(cell);
+    }
+  }
+}
+
+/* generate new pieces */
+function genPieces(){
+  piecesArea.innerHTML="";
+  for(let i=0;i<3;i++){
+    const shape=shapes[Math.floor(Math.random()*shapes.length)];
+    const piece=document.createElement("div");
+    piece.className="piece";
+    shape.forEach((row,y)=>{
+      row.forEach((val,x)=>{
+        if(val){
+          const mini=document.createElement("div");
+          mini.className="cell-mini";
+          piece.appendChild(mini);
+        } else {
+          const spacer=document.createElement("div");
+          piece.appendChild(spacer);
+        }
+      });
+    });
+    piece.dataset.shape=JSON.stringify(shape);
+    piece.addEventListener("click",()=>{
+      document.querySelectorAll(".piece").forEach(p=>p.classList.remove("selected"));
+      piece.classList.add("selected");
+      selectedPiece=shape;
+    });
+    piecesArea.appendChild(piece);
+  }
+}
+
+/* place piece */
+function placePiece(r,c){
+  if(!selectedPiece) return;
+  if(canPlace(selectedPiece,r,c)){
+    applyPiece(selectedPiece,r,c);
+    selectedPiece=null;
+    document.querySelectorAll(".piece").forEach(p=>p.classList.remove("selected"));
+    checkLines();
+    buildBoard();
+  }
+}
+
+/* check if placement valid */
+function canPlace(shape,r,c){
+  for(let y=0;y<shape.length;y++){
+    for(let x=0;x<shape[y].length;x++){
+      if(shape[y][x]){
+        let rr=r+y,cc=c+x;
+        if(rr>=gridSize||cc>=gridSize||board[rr][cc]) return false;
+      }
+    }
+  }
+  return true;
+}
+
+/* apply piece */
+function applyPiece(shape,r,c){
+  let placed=0;
+  for(let y=0;y<shape.length;y++){
+    for(let x=0;x<shape[y].length;x++){
+      if(shape[y][x]){
+        board[r+y][c+x]=1;
+        placed++;
+      }
+    }
+  }
+  score+=placed;
+  scoreEl.textContent=score;
+}
+
+/* clear lines */
+function checkLines(){
+  let cleared=0;
+  for(let r=0;r<gridSize;r++){
+    if(board[r].every(cell=>cell===1)){
+      board[r].fill(0); cleared+=gridSize;
+    }
+  }
+  for(let c=0;c<gridSize;c++){
+    if(board.every(row=>row[c]===1)){
+      for(let r=0;r<gridSize;r++) board[r][c]=0;
+      cleared+=gridSize;
+    }
+  }
+  if(cleared){
+    score+=cleared*2;
+    scoreEl.textContent=score;
+  }
+  if(score>highScore){
+    highScore=score;
+    highScoreEl.textContent=highScore;
+    localStorage.setItem("highScore",highScore);
+  }
+}
+
+/* reset */
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  board=Array.from({length:gridSize},()=>Array(gridSize).fill(0));
+  score=0;
+  scoreEl.textContent=score;
+  buildBoard(); genPieces();
+});
+
+/* shuffle */
+document.getElementById("shuffleBtn").addEventListener("click",genPieces);
+
+/* deselect */
+document.getElementById("deselectBtn").addEventListener("click",()=>{
+  selectedPiece=null;
+  document.querySelectorAll(".piece").forEach(p=>p.classList.remove("selected"));
+});
+
+/* rotate piece */
+document.getElementById("rotateBtn").addEventListener("click",()=>{
+  if(!selectedPiece) return;
+  selectedPiece=rotateMatrix(selectedPiece);
+  genPieces();
+});
+
+/* rotate helper */
+function rotateMatrix(matrix){
+  const rows=matrix.length, cols=matrix[0].length;
+  const rotated=Array.from({length:cols},()=>Array(rows).fill(0));
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      rotated[c][rows-1-r]=matrix[r][c];
+    }
+  }
+  return rotated;
+}
+
+/* init */
+buildBoard();
+genPieces();
 </script>
 </body>
 </html>
-
