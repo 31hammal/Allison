@@ -73,7 +73,6 @@
         <div class="controls" style="margin-top:10px">
           <button id="rotateBtn">Rotate</button>
           <button id="clearBtn">Reset Board</button>
-          <button id="hintBtn">Hint</button>
         </div>
       </div>
 
@@ -108,7 +107,7 @@
   </div>
 
 <script>
-/* === GAME SCRIPT WITH COLUMN CLEARING & TOGGLABLE HINT === */
+/* === GAME SCRIPT WITHOUT HINT === */
 const ROWS=9,COLS=9,CELL_PX=60;
 const canvas=document.getElementById('board'),ctx=canvas.getContext('2d');
 let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
@@ -121,8 +120,6 @@ let selectedIndex=null,selectedRotation=0,placementsCount=0,difficultyLevel=0;
 let previewRow=0,previewCol=0;
 
 const blockColor="#bfe9ff",cellStroke="rgba(123,60,167,0.12)",boardBg="#ffd1e6";
-
-let hintActive=false,hintPiece=null,hintPos=null; // NEW
 
 const BASE_SHAPES=[
   [[0,0]], [[0,0],[1,0]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[1,0]],
@@ -143,7 +140,6 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const x=c*CELL_PX,y=r*CELL_PX;ctx.fillStyle=board[r][c]?blockColor:boardBg;ctx.fillRect(x+2,y+2,CELL_PX-4,CELL_PX-4);ctx.strokeStyle=cellStroke;ctx.strokeRect(x+2,y+2,CELL_PX-4,CELL_PX-4);}
   if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);ctx.fillStyle="rgba(0,0,0,0.2)";piece.forEach(([x,y])=>{const rr=previewRow+y,cc=previewCol+x;if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS)ctx.fillRect(cc*CELL_PX+6,rr*CELL_PX+6,CELL_PX-12,CELL_PX-12);});}
-  if(hintActive && hintPiece && hintPos){ctx.fillStyle="rgba(91,40,168,0.18)";hintPiece.forEach(([x,y])=>ctx.fillRect((hintPos[1]+x)*CELL_PX+4,(hintPos[0]+y)*CELL_PX+4,CELL_PX-8,CELL_PX-8));}
   for(let i=0;i<3;i++){const slot=document.getElementById('slot'+i);slot.innerHTML="";const piece=upcoming[i];if(!piece)continue;const mini=document.createElement('canvas');mini.width=120;mini.height=90;const mctx=mini.getContext('2d');const maxX=Math.max(...piece.map(a=>a[0])),maxY=Math.max(...piece.map(a=>a[1]));const cell=Math.min(20,Math.floor(Math.min(mini.width/(maxX+2),mini.height/(maxY+2))));const ox=(mini.width-cell*(maxX+1))/2,oy=(mini.height-cell*(maxY+1))/2;piece.forEach(([x,y])=>{mctx.fillStyle=blockColor;mctx.fillRect(ox+x*cell+2,oy+y*cell+2,cell-4,cell-4);});slot.appendChild(mini);}}
 function updateScoreDisplay(){document.getElementById('score').textContent=score;if(score>highscore){highscore=score;localStorage.setItem('allisonsBlocksHighscore',highscore);}document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;document.getElementById('aboveScore').textContent="Highscore: "+highscore;}
 function postPlacement(){const filledRows=findFilledRows();const filledCols=findFilledCols();if(filledRows.length||filledCols.length){score+=2*(filledRows.length+filledCols.length);clearRowsAndCols(filledRows,filledCols);if(board.flat().every(x=>x===0))score+=3;}updateScoreDisplay();}
@@ -151,19 +147,14 @@ function refillUpcoming(){for(let i=0;i<3;i++)if(!upcoming[i])upcoming[i]=genera
 function rotatePiece(piece,rot){let p=piece.map(a=>[...a]);for(let i=0;i<rot;i++){p=p.map(([x,y])=>[y,-x]);let minx=Math.min(...p.map(a=>a[0])),miny=Math.min(...p.map(a=>a[1]));p=p.map(([x,y])=>[x-minx,y-miny]);}return p;}
 
 /* canvas click */
-canvas.addEventListener('click',ev=>{if(selectedIndex===null)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((ev.clientX-rect.left)/CELL_PX),row=Math.floor((ev.clientY-rect.top)/CELL_PX);const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,row,col)){placePiece(piece,row,col);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;hintActive=false;postPlacement();refillUpcoming();draw();}});
+canvas.addEventListener('click',ev=>{if(selectedIndex===null)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((ev.clientX-rect.left)/CELL_PX),row=Math.floor((ev.clientY-rect.top)/CELL_PX);const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,row,col)){placePiece(piece,row,col);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}});
 
 /* slot click */
 for(let i=0;i<3;i++)document.getElementById('slot'+i).addEventListener('click',()=>{selectedIndex=i;selectedRotation=0;previewRow=0;previewCol=0;draw();});
 
 /* buttons */
 document.getElementById('rotateBtn').onclick=()=>{selectedRotation=(selectedRotation+1)%4;draw();};
-document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);hintActive=false;refillUpcoming();updateScoreDisplay();draw();};
-document.getElementById('hintBtn').onclick=()=>{
-  if(hintActive){hintActive=false;hintPiece=null;hintPos=null;}
-  else {for(const p of upcoming){const pos=findAnyValidPlacement(p);if(pos){hintActive=true;hintPiece=p;hintPos=pos;break;}}}
-  draw();
-};
+document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);refillUpcoming();updateScoreDisplay();draw();};
 
 /* modal */
 document.getElementById('instrBtn').onclick=()=>modal.style.display="flex";
@@ -179,11 +170,11 @@ document.addEventListener('keydown',e=>{
   else if(e.key==="ArrowDown"){if(selectedIndex!==null){previewRow=Math.min(ROWS-1,previewRow+1);draw();}}
   else if(e.key==="ArrowLeft"){if(selectedIndex!==null){previewCol=Math.max(0,previewCol-1);draw();}}
   else if(e.key==="ArrowRight"){if(selectedIndex!==null){previewCol=Math.min(COLS-1,previewCol+1);draw();}}
-  else if(e.key==="Enter"||e.key===" "){if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,previewRow,previewCol)){placePiece(piece,previewRow,previewCol);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;hintActive=false;postPlacement();refillUpcoming();draw();}}}
-  else if(e.key==="Escape"){selectedIndex=null;hintActive=false;draw();}
+  else if(e.key==="Enter"||e.key===" "){if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,previewRow,previewCol)){placePiece(piece,previewRow,previewCol);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}}}
+  else if(e.key==="Escape"){selectedIndex=null;draw();}
 });
 
-/* start */
+/* init */
 refillUpcoming();draw();updateScoreDisplay();
 </script>
 </body>
