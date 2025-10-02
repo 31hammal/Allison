@@ -1,114 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Allison's Blocks</title>
-<style>
-  :root{
-    --board-pink: #ffd1e6;
-    --block-blue: #bfe9ff;
-    --accent-purple: #d6c7ff;
-    --bg: #f9f6ff;
-    --grid-gap: 4px;
-  }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#222;background:var(--bg);display:flex;align-items:center;justify-content:center;}
-  .app{
-    width:920px; max-width:96vw; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.08); border-radius:18px; background:linear-gradient(180deg,#fff,#f6f3ff);
-    display:grid; grid-template-columns: 560px 1fr; gap:18px; align-items:start;
-  }
-  .header{grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;}
-  h1{margin:0;font-size:20px;color:var(--accent-purple);display:flex;gap:8px;align-items:center}
-  .badge{background:var(--accent-purple);color:white;padding:6px 10px;border-radius:999px;font-weight:600}
-  .board-wrap{background:var(--board-pink); padding:14px; border-radius:12px; box-shadow: 0 6px 20px rgba(182,150,255,0.12) inset; display:flex; flex-direction:column; align-items:center;}
-  canvas#board{background:transparent;border-radius:8px; cursor:crosshair; image-rendering:pixelated;}
-  .hud{display:flex;gap:10px;align-items:center;margin-top:10px}
-  .score-box{background:linear-gradient(180deg,#fff,#f2e9ff); border-radius:10px; padding:8px 12px; box-shadow:0 6px 18px rgba(214,199,255,0.25); color:var(--accent-purple); font-weight:700}
-  .highscore{font-size:12px;color:#6b4fb2}
-  .right-col{display:flex;flex-direction:column;gap:12px; align-items:stretch;}
-  .upcoming{background:linear-gradient(180deg,#fff,#f6f4ff); padding:12px;border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.04);}
-  .piece-slot{width:100%;height:90px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -6px 18px rgba(0,0,0,0.02);}
-  .controls{display:flex;gap:8px;flex-wrap:wrap; margin-top:6px;}
-  #instrBtn{position:fixed; right:20px; bottom:20px; z-index:1000;
-    background:linear-gradient(135deg,#f0e6ff,#eadbff); border:1px solid rgba(180,140,255,0.4); color:#4b2d8a; font-weight:700;
-    padding:12px 16px; border-radius:999px; box-shadow: 0 6px 18px rgba(160,120,255,0.18), 0 1px 0 rgba(255,255,255,0.6) inset; cursor:pointer;}
-  footer{grid-column:1 / -1; font-size:12px; color:#6b5aa0; text-align:center; margin-top:6px}
-  .modal{position:fixed; inset:0; background:rgba(0,0,0,0.35); display:flex;align-items:center;justify-content:center; z-index:2000; display:none;}
-  .modal .card{background:white; padding:18px; width:560px; max-width:92vw; border-radius:12px; box-shadow:0 30px 60px rgba(0,0,0,0.35);}
-  .close{float:right; cursor:pointer; color:var(--accent-purple); font-weight:800}
-  @media (max-width:760px){ .app{grid-template-columns:1fr; width:98vw;} }
-</style>
-</head>
-<body>
-  <div class="app" role="application" aria-label="Allison's Blocks game">
-    <div class="header">
-      <h1>💠 Allison's Blocks</h1>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="badge" id="highscoreDisplay">Highscore: 0</div>
-      </div>
-    </div>
-
-    <div class="board-wrap">
-      <canvas id="board" width="540" height="540" tabindex="0" aria-label="Game board"></canvas>
-      <div class="hud">
-        <div class="score-box">
-          <div>Score: <span id="score">0</span></div>
-          <div class="highscore" id="aboveScore">Highscore: 0</div>
-        </div>
-        <div style="margin-left:auto; color:var(--accent-purple); font-weight:700; padding:6px 10px; border-radius:8px;">9 × 9</div>
-      </div>
-    </div>
-
-    <div class="right-col">
-      <div class="upcoming">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <strong style="color:var(--accent-purple)">Upcoming Pieces</strong>
-          <div style="font-size:12px;color:#7a579f">Place each piece to get points</div>
-        </div>
-        <div id="upcomingContainer" style="display:grid;grid-template-rows:repeat(3,1fr);gap:8px">
-          <div class="piece-slot" data-index="0" id="slot0"></div>
-          <div class="piece-slot" data-index="1" id="slot1"></div>
-          <div class="piece-slot" data-index="2" id="slot2"></div>
-        </div>
-        <div class="controls" style="margin-top:10px">
-          <button id="rotateBtn">Rotate</button>
-          <button id="clearBtn">Reset Board</button>
-          <button id="hintBtn">Hint</button>
-        </div>
-      </div>
-
-      <div style="background:linear-gradient(180deg,#fff,#faf6ff);padding:12px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.03);">
-        <div style="font-weight:800;color:var(--accent-purple)">Settings</div>
-        <div style="margin-top:10px;font-size:13px;color:#5a3f9f">
-          Tip: Each placed block = <strong>+1</strong> point. Full row or column cleared = <strong>+2</strong>. Whole board cleared = <strong>+3</strong>.
-        </div>
-      </div>
-    </div>
-
-    <footer>Made with 💜 · Blocks are light blue · Board pink · Accents light purple</footer>
-  </div>
-
-  <button id="instrBtn">Instructions</button>
-
-  <div class="modal" id="modal">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <h3 style="margin:0;color:var(--accent-purple)">How to play</h3>
-        <div class="close" id="closeModal" title="Close">✕</div>
-      </div>
-      <div style="margin-top:10px; line-height:1.5; color:#3b2b66">
-        <ul>
-          <li>Place blocks on the 9×9 board. Each block = <strong>1 point</strong>.</li>
-          <li>Fill an entire row or column to clear it and earn <strong>+2 points</strong>.</li>
-          <li>If the whole board is cleared, you earn <strong>+3 extra points</strong>.</li>
-          <li>Use keyboard: 1–3 to pick piece, Arrows to move, R to rotate, Enter/Space to place, Esc to cancel.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
 <script>
-/* === GAME SCRIPT WITH COLUMN CLEARING === */
+/* === GAME SCRIPT WITH COLUMN CLEARING & TOGGLABLE HINT === */
 const ROWS=9,COLS=9,CELL_PX=60;
 const canvas=document.getElementById('board'),ctx=canvas.getContext('2d');
 let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
@@ -121,6 +12,8 @@ let selectedIndex=null,selectedRotation=0,placementsCount=0,difficultyLevel=0;
 let previewRow=0,previewCol=0;
 
 const blockColor="#bfe9ff",cellStroke="rgba(123,60,167,0.12)",boardBg="#ffd1e6";
+
+let hintActive=false,hintPiece=null,hintPos=null; // NEW
 
 const BASE_SHAPES=[
   [[0,0]], [[0,0],[1,0]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[1,0]],
@@ -141,6 +34,8 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const x=c*CELL_PX,y=r*CELL_PX;ctx.fillStyle=board[r][c]?blockColor:boardBg;ctx.fillRect(x+2,y+2,CELL_PX-4,CELL_PX-4);ctx.strokeStyle=cellStroke;ctx.strokeRect(x+2,y+2,CELL_PX-4,CELL_PX-4);}
   if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);ctx.fillStyle="rgba(0,0,0,0.2)";piece.forEach(([x,y])=>{const rr=previewRow+y,cc=previewCol+x;if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS)ctx.fillRect(cc*CELL_PX+6,rr*CELL_PX+6,CELL_PX-12,CELL_PX-12);});}
+  // draw hint if active
+  if(hintActive && hintPiece && hintPos){ctx.fillStyle="rgba(91,40,168,0.18)";hintPiece.forEach(([x,y])=>ctx.fillRect((hintPos[1]+x)*CELL_PX+4,(hintPos[0]+y)*CELL_PX+4,CELL_PX-8,CELL_PX-8));}
   for(let i=0;i<3;i++){const slot=document.getElementById('slot'+i);slot.innerHTML="";const piece=upcoming[i];if(!piece)continue;const mini=document.createElement('canvas');mini.width=120;mini.height=90;const mctx=mini.getContext('2d');const maxX=Math.max(...piece.map(a=>a[0])),maxY=Math.max(...piece.map(a=>a[1]));const cell=Math.min(20,Math.floor(Math.min(mini.width/(maxX+2),mini.height/(maxY+2))));const ox=(mini.width-cell*(maxX+1))/2,oy=(mini.height-cell*(maxY+1))/2;piece.forEach(([x,y])=>{mctx.fillStyle=blockColor;mctx.fillRect(ox+x*cell+2,oy+y*cell+2,cell-4,cell-4);});slot.appendChild(mini);}}
 function updateScoreDisplay(){document.getElementById('score').textContent=score;if(score>highscore){highscore=score;localStorage.setItem('allisonsBlocksHighscore',highscore);}document.getElementById('highscoreDisplay').textContent="Highscore: "+highscore;document.getElementById('aboveScore').textContent="Highscore: "+highscore;}
 function postPlacement(){const filledRows=findFilledRows();const filledCols=findFilledCols();if(filledRows.length||filledCols.length){score+=2*(filledRows.length+filledCols.length);clearRowsAndCols(filledRows,filledCols);if(board.flat().every(x=>x===0))score+=3;}updateScoreDisplay();}
@@ -148,15 +43,22 @@ function refillUpcoming(){for(let i=0;i<3;i++)if(!upcoming[i])upcoming[i]=genera
 function rotatePiece(piece,rot){let p=piece.map(a=>[...a]);for(let i=0;i<rot;i++){p=p.map(([x,y])=>[y,-x]);let minx=Math.min(...p.map(a=>a[0])),miny=Math.min(...p.map(a=>a[1]));p=p.map(([x,y])=>[x-minx,y-miny]);}return p;}
 
 /* canvas click */
-canvas.addEventListener('click',ev=>{if(selectedIndex===null)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((ev.clientX-rect.left)/CELL_PX),row=Math.floor((ev.clientY-rect.top)/CELL_PX);const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,row,col)){placePiece(piece,row,col);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}});
+canvas.addEventListener('click',ev=>{if(selectedIndex===null)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((ev.clientX-rect.left)/CELL_PX),row=Math.floor((ev.clientY-rect.top)/CELL_PX);const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,row,col)){placePiece(piece,row,col);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;hintActive=false;postPlacement();refillUpcoming();draw();}});
 
 /* slot click */
 for(let i=0;i<3;i++)document.getElementById('slot'+i).addEventListener('click',()=>{selectedIndex=i;selectedRotation=0;previewRow=0;previewCol=0;draw();});
 
 /* buttons */
 document.getElementById('rotateBtn').onclick=()=>{selectedRotation=(selectedRotation+1)%4;draw();};
-document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);refillUpcoming();updateScoreDisplay();draw();};
-document.getElementById('hintBtn').onclick=()=>{for(const p of upcoming){const pos=findAnyValidPlacement(p);if(pos){ctx.fillStyle="rgba(91,40,168,0.14)";p.forEach(([x,y])=>ctx.fillRect((pos[1]+x)*CELL_PX+4,(pos[0]+y)*CELL_PX+4,CELL_PX-8,CELL_PX-8));setTimeout(draw,600);break;}}};
+document.getElementById('clearBtn').onclick=()=>{board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;placementsCount=0;difficultyLevel=0;upcoming.fill(null);hintActive=false;refillUpcoming();updateScoreDisplay();draw();};
+document.getElementById('hintBtn').onclick=()=>{
+  if(hintActive){ // turn off
+    hintActive=false; hintPiece=null; hintPos=null;
+  } else { // turn on
+    for(const p of upcoming){const pos=findAnyValidPlacement(p);if(pos){hintActive=true;hintPiece=p;hintPos=pos;break;}}
+  }
+  draw();
+};
 
 /* modal */
 document.getElementById('instrBtn').onclick=()=>modal.style.display="flex";
@@ -173,12 +75,10 @@ document.addEventListener('keydown',e=>{
   else if(e.key==="ArrowLeft"){if(selectedIndex!==null)previewCol=Math.max(0,previewCol-1),draw();}
   else if(e.key==="ArrowRight"){if(selectedIndex!==null)previewCol=Math.min(COLS-1,previewCol+1),draw();}
   else if(e.key==="Escape"){selectedIndex=null;draw();}
-  else if(e.key==="Enter"||e.key===" "){if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,previewRow,previewCol)){placePiece(piece,previewRow,previewCol);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;postPlacement();refillUpcoming();draw();}}}
+  else if(e.key==="Enter"||e.key===" "){if(selectedIndex!==null){const piece=rotatePiece(upcoming[selectedIndex],selectedRotation);if(canPlace(piece,previewRow,previewCol)){placePiece(piece,previewRow,previewCol);score+=piece.length;placementsCount++;if(placementsCount%10===0)difficultyLevel++;upcoming[selectedIndex]=null;selectedIndex=null;hintActive=false;postPlacement();refillUpcoming();draw();}}}
 });
 
 /* init */
 refillUpcoming();updateScoreDisplay();draw();
 </script>
-</body>
-</html>
 
